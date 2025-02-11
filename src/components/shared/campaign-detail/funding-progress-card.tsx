@@ -23,6 +23,7 @@ interface FundingProgressCardProps {
   setWithdrawAmount: (value: number) => void;
   showCloseDialog: boolean;
   setShowCloseDialog: (value: boolean) => void;
+  loading: boolean;
 }
 
 export const FundingProgressCard = ({
@@ -37,11 +38,18 @@ export const FundingProgressCard = ({
   setWithdrawAmount,
   showCloseDialog,
   setShowCloseDialog,
+  loading,
 }: FundingProgressCardProps) => {
   const progress = (campaign.amountRaised / campaign.goal) * 100;
 
   return (
-    <Card className={`sticky top-32 ${campaign.creator === publicKey?.toBase58().toString()?"h-[400px]":"h-[300px]"}`}>
+    <Card
+      className={`sticky top-32 ${
+        campaign.creator === publicKey?.toBase58().toString()
+          ? "h-[400px]"
+          : "h-[300px]"
+      }`}
+    >
       <CardHeader>
         <CardTitle>Funding Progress</CardTitle>
       </CardHeader>
@@ -69,7 +77,9 @@ export const FundingProgressCard = ({
           </div>
           <div className="flex justify-between">
             <span>Withdrawals</span>
-            <span className="text-muted-foreground">{campaign.withdrawals}</span>
+            <span className="text-muted-foreground">
+              {campaign.withdrawals}
+            </span>
           </div>
           <div className="flex justify-between">
             <span>Current Balance</span>
@@ -85,6 +95,7 @@ export const FundingProgressCard = ({
           donationAmount={donationAmount}
           setDonationAmount={setDonationAmount}
           handleDonate={handleDonate}
+          loading={loading}
         />
 
         {campaign.creator === publicKey?.toBase58().toString() && (
@@ -93,7 +104,8 @@ export const FundingProgressCard = ({
             withdrawAmount={withdrawAmount}
             setWithdrawAmount={setWithdrawAmount}
             handleWithdraw={handleWithdraw}
-            disabled = {progress===100}
+            disabled={progress === 100}
+            loading={loading}
           />
         )}
 
@@ -103,6 +115,7 @@ export const FundingProgressCard = ({
             showCloseDialog={showCloseDialog}
             setShowCloseDialog={setShowCloseDialog}
             handleCloseCampaign={handleCloseCampaign}
+            loading = {loading}
           />
         )}
       </CardContent>

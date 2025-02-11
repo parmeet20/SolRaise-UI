@@ -28,6 +28,7 @@ export default function CampaignDetailPage() {
   const [donations, setDonations] = useState<Transaction[]>([]);
   const [withdrawTxs, setWithdrawTxs] = useState<Transaction[]>([]);
   const { publicKey, sendTransaction, signTransaction } = useWallet();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const program = useMemo(
     () => getProvider(publicKey, signTransaction, sendTransaction),
@@ -39,9 +40,15 @@ export default function CampaignDetailPage() {
       if (id) {
         const campaignData = await fetchCampaign(program!, id.toString());
         setCampaign(campaignData);
-        const transactions = await fetchAllTransactions(program!, id.toString());
+        const transactions = await fetchAllTransactions(
+          program!,
+          id.toString()
+        );
         setDonations(transactions);
-        const wTxs = await fetchAllWithdrawTransactions(program!,id.toString());
+        const wTxs = await fetchAllWithdrawTransactions(
+          program!,
+          id.toString()
+        );
         setWithdrawTxs(wTxs);
       }
     } catch (error) {
@@ -53,40 +60,89 @@ export default function CampaignDetailPage() {
     fetchData();
   }, [id, program]);
 
-  if (!campaign || !id) return <div className="pt-28 px-4 text-center">Campaign not found</div>;
+  if (!campaign || !id)
+    return <div className="pt-28 px-4 text-center">Campaign not found</div>;
 
-  const formattedDate = new Date(campaign.timestamp * 1000).toLocaleDateString();
+  const formattedDate = new Date(
+    campaign.timestamp * 1000
+  ).toLocaleDateString();
 
   const handleDonate = async () => {
-    const tx = await dontateToCampaign(program!, publicKey!, campaign.publicKey, donationAmount);
-    fetchData();
-    toast({title:"Donation success",
-      action:(<a href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}>Signature</a>)
-    })
+    try {
+      setLoading(true);
+      const tx = await dontateToCampaign(
+        program!,
+        publicKey!,
+        campaign.publicKey,
+        donationAmount
+      );
+      fetchData();
+      toast({
+        title: "Donation success",
+        action: (
+          <a href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}>
+            Signature
+          </a>
+        ),
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleWithdraw = async () => {
-    const tx = await withdrawFromCampaigh(program!, campaign.publicKey, publicKey!, withdrawAmount);
-    fetchData();
-    toast({title:"Withdraw success",
-      action:(<a href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}>Signature</a>)
-    })
+    try {
+      setLoading(true);
+      const tx = await withdrawFromCampaigh(
+        program!,
+        campaign.publicKey,
+        publicKey!,
+        withdrawAmount
+      );
+      fetchData();
+      toast({
+        title: "Withdraw success",
+        action: (
+          <a href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}>
+            Signature
+          </a>
+        ),
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCloseCampaign = async () => {
-    const tx = await closeCampaign(program!, publicKey!, campaign.publicKey);
-    setShowCloseDialog(false);
-    fetchData();
-    toast({title:"Campaign closed successfully",
-      action:(<a href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}>Signature</a>)
-    })
+    try {
+      setLoading(true);
+      const tx = await closeCampaign(program!, publicKey!, campaign.publicKey);
+      setShowCloseDialog(false);
+      fetchData();
+      toast({
+        title: "Campaign closed successfully",
+        action: (
+          <a href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}>
+            Signature
+          </a>
+        ),
+      });
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setLoading(false);
+    }
   };
 
   return (
     <div className="pt-28 px-4  md:px-8 lg:px-16 max-w-7xl mx-auto">
       <div className="grid lg:grid-cols-3 gap-8">
         <CampaignDetails campaign={campaign} formattedDate={formattedDate} />
-        
+
         <FundingProgressCard
           campaign={campaign}
           publicKey={publicKey!}
@@ -99,6 +155,7 @@ export default function CampaignDetailPage() {
           setWithdrawAmount={setWithdrawAmount}
           showCloseDialog={showCloseDialog}
           setShowCloseDialog={setShowCloseDialog}
+          loading={loading}
         />
       </div>
 

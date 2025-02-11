@@ -24,9 +24,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { createCampaign, getProvider } from "@/services/blockchain";
-import { toast} from "../hooks/use-toast";
+import { toast } from "../hooks/use-toast";
 
 const formSchema = z.object({
   title: z
@@ -54,6 +54,7 @@ const formSchema = z.object({
 });
 
 const CreateCampaignPage = () => {
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,16 +65,34 @@ const CreateCampaignPage = () => {
     },
   });
 
-  const {publicKey,sendTransaction,signTransaction} = useWallet();
-  const program = useMemo(()=>getProvider(publicKey,signTransaction,sendTransaction),[publicKey,sendTransaction,signTransaction])
+  const { publicKey, sendTransaction, signTransaction } = useWallet();
+  const program = useMemo(
+    () => getProvider(publicKey, signTransaction, sendTransaction),
+    [publicKey, sendTransaction, signTransaction]
+  );
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-        const tx = await createCampaign(program!,publicKey!,values.title,values.description,values.imageUrl,values.goal);
-        toast({title:"Campaign created successfully",
-          action:(<a href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}>Signature</a>)
-        })
+      setLoading(true);
+      const tx = await createCampaign(
+        program!,
+        publicKey!,
+        values.title,
+        values.description,
+        values.imageUrl,
+        values.goal
+      );
+      toast({
+        title: "Campaign created successfully",
+        action: (
+          <a href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}>
+            Signature
+          </a>
+        ),
+      });
     } catch (error) {
-        console.log(error);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -182,8 +201,12 @@ const CreateCampaignPage = () => {
               />
 
               <div className="flex justify-end">
-                <Button type="submit" className="w-full">
-                  Launch Campaign
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full ${loading ? "animate-pulse" : ""}`}
+                >
+                  {!loading ? "Launch Campaign" : "Loading..."}
                 </Button>
               </div>
             </form>

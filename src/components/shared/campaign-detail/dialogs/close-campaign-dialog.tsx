@@ -9,6 +9,7 @@ interface CloseCampaignDialogProps {
   showCloseDialog: boolean;
   setShowCloseDialog: (value: boolean) => void;
   handleCloseCampaign: () => void;
+  loading:boolean;
 }
 
 export const CloseCampaignDialog = ({
@@ -16,6 +17,7 @@ export const CloseCampaignDialog = ({
   showCloseDialog,
   setShowCloseDialog,
   handleCloseCampaign,
+  loading
 }: CloseCampaignDialogProps) => (
   <Dialog open={showCloseDialog} onOpenChange={(open) => setShowCloseDialog(open)}>
     <DialogTrigger asChild>
@@ -43,12 +45,14 @@ export const CloseCampaignDialog = ({
         </Button>
         <Button
           variant="destructive"
+          className={`w-full ${loading ? "animate-pulse" : ""}`}
+          disabled={loading}
           onClick={() => {
             handleCloseCampaign(); // Trigger close campaign function
             setShowCloseDialog(false); // Close the dialog
           }}
         >
-          Yes, Close Campaign
+          {!loading?"Yes, Close Campaign":"Loading..."}
         </Button>
       </DialogFooter>
     </DialogContent>
