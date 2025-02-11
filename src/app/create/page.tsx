@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { createCampaign, getProvider } from "@/services/blockchain";
 import { toast} from "../hooks/use-toast";
 
@@ -63,30 +63,19 @@ const CreateCampaignPage = () => {
       goal: 0,
     },
   });
-  const [isLoading, setIsLoading] = useState(false);
 
   const {publicKey,sendTransaction,signTransaction} = useWallet();
   const program = useMemo(()=>getProvider(publicKey,signTransaction,sendTransaction),[publicKey,sendTransaction,signTransaction])
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true); // Start loading
     try {
         const tx = await createCampaign(program!,publicKey!,values.title,values.description,values.imageUrl,values.goal);
-        toast({
-          title:"Campaign created successfully",
+        toast({title:"Campaign created successfully",
           action:(<a href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}>Signature</a>)
         })
     } catch (error) {
         console.log(error);
-        toast({
-          title:"Error creating campaign",
-          description: error instanceof Error ? error.message : "Unknown error occurred",
-          variant: "destructive"
-        })
-    } finally {
-        setIsLoading(false); // End loading
     }
   }
-
 
   return (
     <div className="flex min-h-screen items-center pt-28 justify-center bg-gradient-to-br from-violet-50 to-teal-50 p-4">
@@ -192,39 +181,9 @@ const CreateCampaignPage = () => {
                 )}
               />
 
-<div className="flex justify-end">
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                  disabled={isLoading} // Disable button when loading
-                >
-                  {isLoading ? ( // Conditional render based on loading state
-                    <div className="flex items-center gap-2">
-                      <svg 
-                        className="animate-spin h-5 w-5 text-white" 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        fill="none" 
-                        viewBox="0 0 24 24"
-                      >
-                        <circle 
-                          className="opacity-25" 
-                          cx="12" 
-                          cy="12" 
-                          r="10" 
-                          stroke="currentColor" 
-                          strokeWidth="4"
-                        ></circle>
-                        <path 
-                          className="opacity-75" 
-                          fill="currentColor" 
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Creating...
-                    </div>
-                  ) : (
-                    "Launch Campaign"
-                  )}
+              <div className="flex justify-end">
+                <Button type="submit" className="w-full">
+                  Launch Campaign
                 </Button>
               </div>
             </form>
@@ -234,4 +193,5 @@ const CreateCampaignPage = () => {
     </div>
   );
 };
+
 export default CreateCampaignPage;

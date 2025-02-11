@@ -19,14 +19,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "./hooks/use-toast";
-import { Loader2 } from "lucide-react";
 
 export default function Home() {
   const { publicKey, signTransaction, sendTransaction } = useWallet();
   const [fee, setFee] = useState<number | string>(""); // Store input fee value
   const [isDialogOpen, setDialogOpen] = useState(false); // State to control dialog visibility
   const [owner, setOwner] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
 
   const program = useMemo(
     () => getProvider(publicKey, signTransaction, sendTransaction),
@@ -43,39 +41,27 @@ export default function Home() {
     }
   }, [program, publicKey]);
   const handleSetFee = async () => {
-    try {
-      setLoading(true);
-      if (Number(fee) <= 10) {
-        const tx = await updatePlatformFee(program!, publicKey!, Number(fee));
-        console.log(tx);
-        toast({
-          title: "Platform Fee Updated Successfully",
-          action: (
-            <a
-              target="_blank"
-              href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}
-            >
-              Signature
-            </a>
-          ),
-        });
-        setDialogOpen(!isDialogOpen);
-      } else {
-        toast({
-          title: "Platform fee Error",
-          description: "should be less than or equal to 10%",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
+    if (Number(fee) <= 10) {
+      const tx = await updatePlatformFee(program!, publicKey!, Number(fee));
+      console.log(tx);
+      toast({
+        title: "Platform Fee Updated Successfully",
+        action: (
+          <a
+            target="_blank"
+            href={`https://explorer.solana.com/tx/${tx}/?cluster=devnet`}
+          >
+            Signature
+          </a>
+        ),
+      });
+      setDialogOpen(!isDialogOpen);
+    } else {
       toast({
         title: "Platform fee Error",
         description: "should be less than or equal to 10%",
         variant: "destructive",
       });
-      console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -112,14 +98,7 @@ export default function Home() {
                 <Button variant="outline" onClick={handleCancel}>
                   Cancel
                 </Button>
-                {!loading ? (
-                  <Button onClick={handleSetFee}>Set Fee</Button>
-                ) : (
-                  <Button disabled>
-                    <Loader2 className="animate-spin" />
-                    Please wait
-                  </Button>
-                )}
+                <Button onClick={handleSetFee}>Set Fee</Button>
               </div>
             </DialogContent>
           </Dialog>
