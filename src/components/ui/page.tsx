@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { toast } from "./hooks/use-toast";
+import { toast } from "@/app/hooks/use-toast";
 
 export default function Home() {
   const { publicKey, signTransaction, sendTransaction } = useWallet();
