@@ -220,6 +220,19 @@ const serializedCampaigns = (campaigns: RawCampaign[]): Campaign[] => {
   }));
 };
 
+export const fetchAllWithdrawTransactions = async (
+  program: Program<CFunding>,
+  pda: string
+): Promise<Transaction[]> => {
+  const campaign = await program.account.campaign.fetch(pda);
+  const transactions = await program.account.transaction.all();
+  const donations = transactions.filter(
+    (c) => c.account.cid.eq(campaign.cid) && !c.account.credited
+  );
+  store.dispatch(setDonations(serializedTxs(donations)));
+  return serializedTxs(donations);
+};
+
 export const fetchAllTransactions = async (
   program: Program<CFunding>,
   pda: string
@@ -233,6 +246,45 @@ export const fetchAllTransactions = async (
   );
   store.dispatch(setDonations(serializedTxs(donations)));
   return serializedTxs(donations);
+};
+
+export const dontateToCampaign = async (
+  program: Program<CFunding>,
+  publicKey: PublicKey,
+  pda: string,
+  amount: number
+): Promise<TransactionSignature> => {
+  const campaign = await program.account.campaign.fetch(pda);
+  const [transactionPda] = PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("donor"),
+      publicKey.toBuffer(),
+      campaign.cid.toArrayLike(Buffer, "le", 8),
+      campaign.donors.add(new BN(1)).toArrayLike(Buffer, "le", 8),
+    ],
+    program.programId
+  );
+  const [campaignPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from("campaign"), campaign.cid.toArrayLike(Buffer, "le", 8)],
+    program.programId
+  );
+
+  const donationAmount = new BN(Math.round(amount) * 1_000_000_000);
+  const tx = await program.methods
+    .donate(campaign.cid, donationAmount)
+    .accountsPartial({
+      campaign: campaignPda,
+      transaction: transactionPda,
+      donor: publicKey,
+      systemProgram: SystemProgram.programId,
+    })
+    .rpc();
+  const connection = new Connection(
+    program.provider.connection.rpcEndpoint,
+    "confirmed"
+  );
+  await connection.confirmTransaction(tx, "finalized");
+  return tx;
 };
 
 const serializedTxs = (transactions: RawTransaction[]): Transaction[] => {
