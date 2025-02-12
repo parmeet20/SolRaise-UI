@@ -1,15 +1,24 @@
 "use client";
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Campaign } from "@/utils/interface";
+import { Loader2 } from "lucide-react";
 
 interface CloseCampaignDialogProps {
   campaign: Campaign;
   showCloseDialog: boolean;
   setShowCloseDialog: (value: boolean) => void;
   handleCloseCampaign: () => void;
-  loading:boolean;
+  loading: boolean;
 }
 
 export const CloseCampaignDialog = ({
@@ -17,9 +26,12 @@ export const CloseCampaignDialog = ({
   showCloseDialog,
   setShowCloseDialog,
   handleCloseCampaign,
-  loading
+  loading,
 }: CloseCampaignDialogProps) => (
-  <Dialog open={showCloseDialog} onOpenChange={(open) => setShowCloseDialog(open)}>
+  <Dialog
+    open={showCloseDialog}
+    onOpenChange={(open) => setShowCloseDialog(open)}
+  >
     <DialogTrigger asChild>
       <Button
         className="w-full"
@@ -35,7 +47,8 @@ export const CloseCampaignDialog = ({
       <DialogHeader>
         <DialogTitle>Are you sure you want to close this campaign?</DialogTitle>
         <DialogDescription>
-          Once you close this campaign, no further donations or withdrawals will be possible.
+          Once you close this campaign, no further donations or withdrawals will
+          be possible.
         </DialogDescription>
       </DialogHeader>
 
@@ -45,14 +58,18 @@ export const CloseCampaignDialog = ({
         </Button>
         <Button
           variant="destructive"
-          className={`w-full ${loading ? "animate-pulse" : ""}`}
+          className={`w-full flex items-center ${
+            loading ? "animate-pulse" : ""
+          }`}
           disabled={loading}
           onClick={() => {
             handleCloseCampaign(); // Trigger close campaign function
             setShowCloseDialog(false); // Close the dialog
           }}
         >
-          {!loading?"Yes, Close Campaign":"Loading..."}
+          {loading && <Loader2 />}
+
+          {!loading ? "Yes, Close Campaign" : "Loading..."}
         </Button>
       </DialogFooter>
     </DialogContent>

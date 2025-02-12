@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Campaign } from "@/utils/interface";
+import { Loader2 } from "lucide-react";
 
 interface DonateDialogProps {
   campaign: Campaign;
@@ -58,11 +59,13 @@ export const WithdrawDialog = ({
       />
       <DialogFooter>
         <Button
-          className={`w-full ${loading ? "animate-pulse" : ""}`}
+          className={`w-full flex items-center ${loading ? "animate-pulse" : ""}`}
           disabled={loading}
           onClick={handleWithdraw}
         >
-          {!loading?`Withdraw {withdrawAmount} SOL`:"Loading..."}
+          {loading && <Loader2 />}
+
+          {!loading ? `Withdraw {withdrawAmount} SOL` : "Loading..."}
         </Button>
       </DialogFooter>
     </DialogContent>
