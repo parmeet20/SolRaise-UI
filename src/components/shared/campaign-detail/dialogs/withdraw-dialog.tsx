@@ -63,7 +63,7 @@ export const WithdrawDialog = ({
           disabled={loading}
           onClick={handleWithdraw}
         >
-          {loading && <Loader2 />}
+          {loading && <Loader2 className="animate-spin" />}
 
           {!loading ? `Withdraw {withdrawAmount} SOL` : "Loading..."}
         </Button>

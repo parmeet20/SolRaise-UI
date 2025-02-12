@@ -59,7 +59,7 @@ export const DonateDialog = ({
           disabled={loading}
           onClick={handleDonate}
         >
-          {loading && <Loader2/>}
+          {loading && <Loader2 className="animate-spin"/>}
           {!loading ? `Donate ${donationAmount} SOL` : "Loading..."}
         </Button>
       </DialogFooter>

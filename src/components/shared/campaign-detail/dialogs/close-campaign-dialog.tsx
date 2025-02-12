@@ -67,7 +67,7 @@ export const CloseCampaignDialog = ({
             setShowCloseDialog(false); // Close the dialog
           }}
         >
-          {loading && <Loader2 />}
+          {loading && <Loader2 className="animate-spin" />}
 
           {!loading ? "Yes, Close Campaign" : "Loading..."}
         </Button>
