@@ -1,13 +1,11 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-const CampaignCard =  dynamic(()=>import("./CampaignCard"));
-import {
-  fetchActiveCampaigns,
-  getProvider,
-} from "@/services/blockchain";
+const CampaignCard = dynamic(() => import("./CampaignCard"));
+import { fetchActiveCampaigns, getProvider } from "@/services/blockchain";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Campaign } from "@/utils/interface";
 import dynamic from "next/dynamic";
+import { Button } from "../ui/button";
 
 const CampaignList = () => {
   const { publicKey, sendTransaction, signTransaction } = useWallet();
@@ -28,7 +26,8 @@ const CampaignList = () => {
 
   return (
     <div>
-      {/* <Button onClick={() => fet()}>Fetch Campaigns</Button> */}
+      {publicKey && <Button onClick={() => fet()}>Fetch All Campaigns</Button>}
+      {!publicKey && <p className="text-slate-600 font-mono font-extrabold underline-offset-8 underline">Login to view campaigns</p>}
       <div className="flex p-10 flex-wrap gap-4">
         {campaigns.map((item) => (
           <CampaignCard

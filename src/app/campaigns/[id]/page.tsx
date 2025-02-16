@@ -18,6 +18,7 @@ import { CampaignDetails } from "@/components/shared/campaign-detail/campaign-de
 import { FundingProgressCard } from "@/components/shared/campaign-detail/funding-progress-card";
 import { TransactionTable } from "@/components/shared/campaign-detail/donation-table";
 import { toast } from "@/app/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CampaignDetailPage() {
   const { id } = useParams();
@@ -29,6 +30,7 @@ export default function CampaignDetailPage() {
   const [withdrawTxs, setWithdrawTxs] = useState<Transaction[]>([]);
   const { publicKey, sendTransaction, signTransaction } = useWallet();
   const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const program = useMemo(
     () => getProvider(publicKey, signTransaction, sendTransaction),
@@ -37,28 +39,74 @@ export default function CampaignDetailPage() {
 
   const fetchData = async () => {
     try {
+      setIsLoading(true); // Start loading
       if (id) {
         const campaignData = await fetchCampaign(program!, id.toString());
         setCampaign(campaignData);
-        const transactions = await fetchAllTransactions(
-          program!,
-          id.toString()
-        );
+        const transactions = await fetchAllTransactions(program!, id.toString());
         setDonations(transactions);
-        const wTxs = await fetchAllWithdrawTransactions(
-          program!,
-          id.toString()
-        );
+        const wTxs = await fetchAllWithdrawTransactions(program!, id.toString());
         setWithdrawTxs(wTxs);
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false); // End loading
     }
   };
 
   useEffect(() => {
     fetchData();
   }, [id, program]);
+
+  if (isLoading) {
+    return (
+      <div className="pt-28 px-4 md:px-8 lg:px-16 max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column Skeleton */}
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-8 w-[200px]" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-[300px]" />
+              <Skeleton className="h-4 w-[250px]" />
+              <Skeleton className="h-4 w-[280px]" />
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <Skeleton className="h-16 rounded-lg" />
+              <Skeleton className="h-16 rounded-lg" />
+              <Skeleton className="h-16 rounded-lg" />
+              <Skeleton className="h-16 rounded-lg" />
+            </div>
+          </div>
+
+          {/* Right Column Skeleton */}
+          <div className="space-y-6">
+            <Skeleton className="h-32 rounded-xl" />
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <div className="flex gap-4">
+                <Skeleton className="h-10 w-1/2" />
+                <Skeleton className="h-10 w-1/2" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Table Section Skeletons */}
+        <div className="mt-12 space-y-8">
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-[200px]" />
+            <Skeleton className="h-[200px] w-full rounded-lg" />
+          </div>
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-[200px]" />
+            <Skeleton className="h-[200px] w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!campaign || !id)
     return <div className="pt-28 px-4 text-center">Campaign not found</div>;
