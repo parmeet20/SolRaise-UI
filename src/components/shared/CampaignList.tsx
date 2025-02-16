@@ -27,7 +27,7 @@ const CampaignList = () => {
   return (
     <div>
       {publicKey && <Button onClick={() => fet()}>Fetch All Campaigns</Button>}
-      {!publicKey && <p className="text-slate-600 font-mono font-extrabold underline-offset-8 underline">Login to view campaigns</p>}
+      {!publicKey && <p className="text-slate-600 font-mono font-extrabold">Login to view campaigns</p>}
       <div className="flex p-10 flex-wrap gap-4">
         {campaigns.map((item) => (
           <CampaignCard
