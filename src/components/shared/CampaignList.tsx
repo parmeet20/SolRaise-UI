@@ -22,11 +22,10 @@ const CampaignList = () => {
     if (publicKey) {
       fet();
     }
-  }, []);
+  }, [program]);
 
   return (
     <div>
-      {publicKey && <Button onClick={() => fet()}>Fetch All Campaigns</Button>}
       {!publicKey && <p className="text-slate-600 font-mono font-extrabold">Login to view campaigns</p>}
       <div className="flex p-10 flex-wrap gap-4">
         {campaigns.map((item) => (
