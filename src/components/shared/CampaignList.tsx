@@ -5,7 +5,6 @@ import { fetchActiveCampaigns, getProvider } from "@/services/blockchain";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Campaign } from "@/utils/interface";
 import dynamic from "next/dynamic";
-import { Button } from "../ui/button";
 
 const CampaignList = () => {
   const { publicKey, sendTransaction, signTransaction } = useWallet();
