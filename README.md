@@ -35,7 +35,7 @@ SolRaise UI is the frontend companion to the SolRaise smart contract—bui
 
 ---
 <img width="946" alt="image" src="https://github.com/user-attachments/assets/22913082-3f6d-47c5-aa55-e00149678874" />
-<img width="950" alt="image" src="https://github.com/user-attachments/assets/acc938c7-c36b-4d88-9cc7-8f46cc7e49f1" />
+
 
 ## ✨ Key Features
 
